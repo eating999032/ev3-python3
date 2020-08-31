@@ -2,8 +2,11 @@
 '''
 LEGO EV3 direct commands - ev3
 '''
+# Adding support for win10 methods
+# Make sure you have pybluez installed on Win10 - see http://ev3directcommands.blogspot.com/2016/01/no-title-specified-page-table-border_94.html
 
 import re
+import bluetooth
 import usb.util
 import socket
 import struct
@@ -55,7 +58,10 @@ class PhysicalEV3:
         self._socket = None
 
         if protocol == BLUETOOTH:
-            self._connect_bluetooth()
+            self._socket = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
+            self._socket.connect((host, 1))
+
+            # self._connect_bluetooth()
         elif protocol == WIFI:
             self._connect_wifi()
         else:
@@ -65,11 +71,13 @@ class PhysicalEV3:
         """
         closes the connection to the LEGO EV3
         """
-        if (
-            self._socket is not None and
-            isinstance(self._socket, socket.socket)
-        ):
+        if isinstance(self._socket, bluetooth.BluetoothSocket):
             self._socket.close()
+        # if (
+        #     self._socket is not None and
+        #     isinstance(self._socket, socket.socket)
+        # ):
+        #     self._socket.close()
 
     def next_msg_cnt(self) -> int:
         '''
